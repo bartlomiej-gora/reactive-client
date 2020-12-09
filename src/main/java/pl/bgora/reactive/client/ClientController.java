@@ -1,6 +1,5 @@
 package pl.bgora.reactive.client;
 
-import org.reactivestreams.Subscription;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,24 +17,29 @@ public class ClientController {
     @GetMapping("getData")
     public void getData() {
         webClient.get()
-                 .exchangeToFlux(clientResponse -> clientResponse.bodyToFlux(Integer.class))
-                 .log()
-        .subscribeWith(new BaseSubscriber<Integer>() {
+                .exchangeToFlux(clientResponse -> clientResponse.bodyToFlux(Integer.class))
+                .log()
+                .subscribeWith(new BaseSubscriber<Integer>() {
 
-            private int count = 0;
-            @Override
-            protected void hookOnSubscribe(Subscription subscription) {
-                request(5);
-            }
+                    private int count = 0;
+//            @Override
+//            protected void hookOnSubscribe(Subscription subscription) {
+//                request(5);
+//            }
 
-            @Override
-            protected void hookOnNext(Integer value) {
-                System.out.println("Count:" + ++count);
-                System.out.println("value" + value);
-                if(count >=5) {
-                    cancel();
-                }
-            }
-        });
+                    @Override
+                    protected void hookOnNext(Integer value) {
+                        System.out.println("Count: " + ++count);
+                        System.out.println("value: " + value);
+                        if (count >= 5) {
+                            cancel();
+                        }
+                    }
+
+                    @Override
+                    protected void hookOnCancel() {
+                        System.out.print("Canceled!");
+                    }
+                });
     }
 }
