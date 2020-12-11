@@ -1,5 +1,6 @@
 package pl.bgora.reactive.client;
 
+import org.reactivestreams.Subscription;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,10 +23,10 @@ public class ClientController {
                 .subscribeWith(new BaseSubscriber<Integer>() {
 
                     private int count = 0;
-//            @Override
-//            protected void hookOnSubscribe(Subscription subscription) {
-//                request(5);
-//            }
+            @Override
+            protected void hookOnSubscribe(Subscription subscription) {
+                request(10);
+            }
 
                     @Override
                     protected void hookOnNext(Integer value) {
@@ -39,6 +40,11 @@ public class ClientController {
                     @Override
                     protected void hookOnCancel() {
                         System.out.print("Canceled!");
+                    }
+
+                    @Override
+                    protected void hookOnComplete() {
+                        System.out.print("Completed!");
                     }
                 });
     }
