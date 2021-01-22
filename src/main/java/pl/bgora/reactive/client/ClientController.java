@@ -14,7 +14,7 @@ public class ClientController {
     private final WebClient webClient;
 
     public ClientController() {
-        webClient = WebClient.create("localhost:8090");
+        webClient = WebClient.create("http://localhost:8090");
     }
 
     @GetMapping("getData")
@@ -61,8 +61,15 @@ public class ClientController {
                             if (clientResponse.statusCode().equals(HttpStatus.OK)) {
                                 return clientResponse.bodyToMono(Person.class);
                             } else {
-                                return Mono.error(clientResponse.createException());
+                                return Mono.error(()-> new IllegalStateException());
                             }
                         });
+    }
+
+    @GetMapping("/person/{id}")
+    public Mono<Person> getOne(@PathVariable String id){
+        return webClient.get()
+                .uri("/sync/person", id)
+                .exchangeToMono(clientResponse -> clientResponse.bodyToMono(Person.class));
     }
 }
